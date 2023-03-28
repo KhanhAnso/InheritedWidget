@@ -10,62 +10,67 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text("Demo"),
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
         ),
-        body: OngBa(),
-      )
-    );
+        home: Scaffold(
+          appBar: AppBar(
+            title: Text("Demo"),
+          ),
+          body: DemoInheritedWidget(
+              child: OngBa()
+          ),
+        ));
+  }
+}
+
+class DemoInheritedWidget extends InheritedWidget {
+  int count = 999;
+
+  DemoInheritedWidget({required Widget child}) : super(child: child);
+
+  @override
+  bool updateShouldNotify(DemoInheritedWidget old) {
+    return true;
   }
 }
 
 class OngBa extends StatelessWidget {
 
-  int count = 100;
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: ChaMe(count),
+      child: ChaMe(),
     );
   }
 }
 
 class ChaMe extends StatelessWidget {
 
-  //count để hứng data từ ông bà
-  late int count;
-  //Constructor ChaMe
-  ChaMe(this.count);
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: ConGai(count),
+      child: ConGai(),
     );
   }
 }
 
 class ConGai extends StatelessWidget {
 
-  //count để hứng data từ ông bà
-  late int count;
-  //constructor
-  ConGai(this.count);
-
   @override
   Widget build(BuildContext context) {
+
+    //Để ConGai sử dụng được Count thì ta sẽ truy cập vào InheritedWidget này.
+    DemoInheritedWidget? demo = context.dependOnInheritedWidgetOfExactType<DemoInheritedWidget>();
+
     return Center(
       child: Container(
-        child: Text("$count", style: TextStyle(fontSize: 30),),
+        child: Text(
+          demo!.count.toString(),
+          style: TextStyle(fontSize: 30),
+        ),
       ),
     );
   }
 }
-
-
