@@ -18,17 +18,49 @@ class MyApp extends StatelessWidget {
           appBar: AppBar(
             title: Text("Demo"),
           ),
-          body: DemoInheritedWidget(
-              child: OngBa()
+          body: MyContainer(
+            child: Counter(),
           ),
         ));
   }
 }
 
-class DemoInheritedWidget extends InheritedWidget {
-  int count = 999;
+class MyContainer extends StatefulWidget {
 
-  DemoInheritedWidget({required Widget child}) : super(child: child);
+  Widget child;
+
+  MyContainer({required this.child});
+
+  @override
+  State<MyContainer> createState() => _MyContainerState();
+}
+
+class _MyContainerState extends State<MyContainer> {
+
+  //
+  int data = 0;
+  //khi hàm này được gọi thi stateFul Widget bị rebuild
+  // => Khi đó nó kéo theo InheritedWidget bị rebuild
+  increment(){
+    setState(() {
+      data++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DemoInheritedWidget(child: widget.child, state: this);
+    //widget.child : là child của MyContainer.child
+  }
+}
+
+class DemoInheritedWidget extends InheritedWidget {
+
+  Widget child;
+  _MyContainerState state;
+
+
+  DemoInheritedWidget({required this.child, required this.state}) : super(child: child);
 
   @override
   bool updateShouldNotify(DemoInheritedWidget old) {
@@ -36,40 +68,29 @@ class DemoInheritedWidget extends InheritedWidget {
   }
 }
 
-class OngBa extends StatelessWidget {
+class Counter extends StatefulWidget {
+  const Counter({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: ChaMe(),
-    );
-  }
+  State<Counter> createState() => _CounterState();
 }
 
-class ChaMe extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: ConGai(),
-    );
-  }
-}
-
-class ConGai extends StatelessWidget {
-
+class _CounterState extends State<Counter> {
   @override
   Widget build(BuildContext context) {
 
-    //Để ConGai sử dụng được Count thì ta sẽ truy cập vào InheritedWidget này.
     DemoInheritedWidget? demo = context.dependOnInheritedWidgetOfExactType<DemoInheritedWidget>();
 
     return Center(
-      child: Container(
-        child: Text(
-          demo!.count.toString(),
-          style: TextStyle(fontSize: 30),
-        ),
+      child: Column(
+        children: <Widget>[
+          Text(demo!.state.data.toString(), style: TextStyle(fontSize: 40)),
+          ElevatedButton(onPressed: (){
+            demo.state.increment(); //call increment()
+          },
+            child: Text("Click Me"),
+          )
+        ],
       ),
     );
   }
